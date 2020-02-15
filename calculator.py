@@ -37,50 +37,56 @@ class Equation:
             return self.eval_brackets().evaluate()
         elif ')' in self:
             raise UnevenBracketError
+        elif '[' in self:
+            if ']' not in self:
+                raise UnevenBracketError
+            return self.eval_brackets('[', ']').evaluate()
+        elif ']' in self:
+            raise UnevenBracketError
         elif '^' in self:
             equations = self.split("^")
             value = equations[0].evaluate()
-            for e in equations[1:]:
-                value **= e.evaluate()
+            for eq in equations[1:]:
+                value **= eq.evaluate()
         elif '+' in self:
             equations = self.split('+')
             value = equations[0].evaluate()
-            for e in equations[1:]:
-                value += e.evaluate()
+            for eq in equations[1:]:
+                value += eq.evaluate()
         elif '-' in self:
             equations = self.split('-')
             value = equations[0].evaluate()
-            for e in equations[1:]:
-                value -= e.evaluate()
+            for eq in equations[1:]:
+                value -= eq.evaluate()
         elif '*' in self:
             equations = self.split('*')
             value = equations[0].evaluate()
-            for e in equations[1:]:
-                value *= e.evaluate()
+            for eq in equations[1:]:
+                value *= eq.evaluate()
         elif '/' in self:
             equations = self.split('/')
             value = equations[0].evaluate()
-            for e in equations[1:]:
-                value /= e.evaluate()
+            for eq in equations[1:]:
+                value /= eq.evaluate()
         elif '%' in self:
             equations = self.split('%')
             value = equations[0].evaluate()
-            for e in equations[1:]:
-                value %= e.evaluate()
+            for eq in equations[1:]:
+                value %= eq.evaluate()
         else:
             raise NoOperatorError
         return value
 
-    def eval_brackets(self) -> Union[Equation, int, float]:
+    def eval_brackets(self, l_br: str = '(', r_br: str = ')') -> Union[Equation, int, float]:
         c = self.content
         openbr = 1
         closebr = 0
         index_of_end = -1
-        start = c.find('(')
+        start = c.find(l_br)
         for i in range(start + 1, len(c)):
-            if c[i] == ')':
+            if c[i] == r_br:
                 closebr += 1
-            elif c[i] == '(':
+            elif c[i] == l_br:
                 openbr += 1
             if openbr == closebr:
                 index_of_end = i
@@ -91,11 +97,11 @@ class Equation:
         # Check if there is an operator beside the bracket, else, multiply
         if len(left_side) > 0:
             end_l = left_side[-1]
-            if end_l not in "*/+-^%":
+            if end_l not in "*/+-^%([":
                 left_side += '*'
         if len(right_side) > 0:
             start_r = right_side[0]
-            if start_r not in "*/+-^%":
+            if start_r not in "*/+-^%])":
                 right_side = '*' + right_side
 
         new_c = left_side + \
