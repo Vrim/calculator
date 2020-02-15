@@ -6,13 +6,15 @@ import doctest
 
 class Calculator:
 
-    def __init__(self) -> None:
-        pass
-
-    def calculate(self, equation: Equation) -> Union[int, float]:
+    @staticmethod
+    def calculate(equation: Equation) -> Union[int, float]:
         """Takes an Equation and returns the answer
         """
         return equation.evaluate()
+
+    def check_input(self, s: str) -> Union[int, float]:
+        eq = Equation(s)
+        return self.calculate(eq)
 
 
 class Equation:
@@ -67,13 +69,13 @@ class Equation:
                 value %= e.evaluate()
         else:
             raise NoOperatorError
-
         return value
 
     def eval_brackets(self) -> Union[Equation, int, float]:
         c = self.content
         openbr = 1
         closebr = 0
+        index_of_end = -1
         start = c.find('(')
         for i in range(start + 1, len(c)):
             if c[i] == ')':
@@ -89,13 +91,11 @@ class Equation:
         # Check if there is an operator beside the bracket, else, multiply
         if len(left_side) > 0:
             end_l = left_side[-1]
-            if end_l != "*" and end_l != "/" and end_l != "+" and end_l != "-"\
-                    and end_l != "^" and end_l != "%":
+            if end_l not in "*/+-^%":
                 left_side += '*'
         if len(right_side) > 0:
             start_r = right_side[0]
-            if start_r != "*" and start_r != "/" and start_r != "+" and\
-                    start_r != "-" and start_r != "^" and start_r != "%":
+            if start_r not in "*/+-^%":
                 right_side = '*' + right_side
 
         new_c = left_side + \
@@ -103,7 +103,7 @@ class Equation:
             right_side
         return Equation(new_c)
 
-    def __contains__(self, item):
+    def __contains__(self, item: str) -> bool:
         return item in self.content
 
     def split(self, delim: str) -> List[Equation]:
@@ -125,6 +125,15 @@ class UnevenBracketError(Exception):
 if __name__ == "__main__":
     doctest.testmod()
 
-    import python_ta
+    # import python_ta
+    # python_ta.check_all()
 
-    python_ta.check_all()
+    calculator = Calculator()
+    while True:
+        input_ = input("Enter Equation:")
+
+        try:
+            answer = calculator.check_input(input_)
+            print(answer)
+        except (NoOperatorError, UnevenBracketError) as e:
+            print(f"Invalid Equation! Invalid Format!")
