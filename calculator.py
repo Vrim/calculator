@@ -53,11 +53,14 @@ class Equation:
             value = equations[0].evaluate()
             for eq in equations[1:]:
                 value += eq.evaluate()
-        elif '-' in self:
+        # Check if minus sign or negative number
+        elif '-' in self and \
+            (self.content.index('-') > 0) and \
+            (self.content[(self.content.index('-') - 1)] not in "*/+-^%(["): 
             equations = self.split('-')
             value = equations[0].evaluate()
             for eq in equations[1:]:
-                value -= eq.evaluate()
+                value -= eq.evaluate()        
         elif '*' in self:
             equations = self.split('*')
             value = equations[0].evaluate()
@@ -73,6 +76,11 @@ class Equation:
             value = equations[0].evaluate()
             for eq in equations[1:]:
                 value %= eq.evaluate()
+        # This is a negative symbol, not minus sign.
+        elif '-' in self and \
+            (self.content.index('-') == 0) or \
+            (self.content[(self.content.index('-') - 1)] in "*/+-^%(["):
+            value = (-1) * Equation(self.content[1:]).evaluate()
         else:
             raise NoOperatorError
         return value
