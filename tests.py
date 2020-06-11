@@ -11,6 +11,8 @@ def test_calculate() -> None:
     e5 = Equation("3.0 * 2.0")
     e6 = Equation("3^2")
     e7 = Equation("4 % 3")
+    e8 = Equation("-(2)")
+    e9 = Equation("(3-4)*2")
     assert c.calculate(e1) == 53.0
     assert c.calculate(e2) == 1102417.0
     assert c.calculate(e3) == 9
@@ -18,6 +20,8 @@ def test_calculate() -> None:
     assert c.calculate(e5) == 6.0
     assert c.calculate(e6) == 9
     assert c.calculate(e7) == 1
+    assert c.calculate(e8) == -2
+    assert c.calculate(e9) == -2
 
 
 def test_square_brackets() -> None:
